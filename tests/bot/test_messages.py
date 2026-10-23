@@ -28,6 +28,19 @@ def test_report_text():
     ))
 
 
+def test_report_text_shows_breakdown():
+    text = report_text(make_report(
+        components={"combat": 66, "multi": 70, "entry": 58, "clutch": 41},
+        stats={"adr": 88.06, "kd": 1.184, "kr": 0.781},
+    ))
+    assert "Breakdown (50 = average player):" in text
+    assert "Combat 66 · Multikills 70" in text
+    assert "Entry 58 · Clutch 41" in text
+    assert "ADR 88.1 · K/D 1.18 · K/R 0.78" in text
+
+    assert "Breakdown" not in report_text(make_report())
+
+
 def test_maps_text_escapes_html():
     text = maps_text(make_report())
     assert "Alice &lt;3" in text

@@ -47,7 +47,7 @@ def build_trend_chart(scores, nickname=None):
             color=AVERAGE_COLOR,
             linestyle="--",
             linewidth=1.5,
-            label=f"Average {average:.1f}"
+            label=f"Match average {average:.1f}"
         )
 
         legend = ax.legend(loc="upper left", facecolor=BACKGROUND, edgecolor=FOREGROUND)

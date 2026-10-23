@@ -38,7 +38,7 @@ def test_player_not_found():
 def test_matches():
     no_id = {"stats": {"Map": "de_nuke"}}
     client = FakeClient({"/players/pid/games/cs2/stats": {"items": [
-        history_item("m1", map_name="de_mirage", adr=91.5, kd=1.25, number="2"),
+        history_item("m1", map_name="de_mirage", adr=91.5, kd=1.25, number="2", kills=25, deaths=20),
         no_id,
     ]}})
 
@@ -51,6 +51,7 @@ def test_matches():
     assert matches[0]["match_round"] == "2"
     assert matches[0]["ADR"] == 91.5
     assert matches[0]["KD"] == 1.25
+    assert (matches[0]["kills"], matches[0]["deaths"]) == (25, 20)
 
 
 def test_no_matches():

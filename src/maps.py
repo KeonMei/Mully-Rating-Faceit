@@ -1,99 +1,38 @@
-import requests
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor
 
-from src.match import analyze_match
-from src.score import compute_score, clutch_rate, multikill_score, score_tier
+from src.score import score_tier
 
 
-def get_map_stats(player_id, headers, limit=50):
+def pretty_map_name(name):
+    """'de_mirage' -> 'Mirage'."""
 
-    url = f"https://open.faceit.com/data/v4/players/{player_id}/games/cs2/stats"
+    if not name:
+        return "Unknown"
 
-    params = {
-        "limit": limit,
-        "offset": 0
-    }
+    for prefix in ("de_", "cs_"):
+        if name.startswith(prefix):
+            name = name[len(prefix):]
 
-    response = requests.get(url, headers=headers, params=params)
-    data = response.json()
+    return name.replace("_", " ").title()
 
-    matches = data.get("items", [])
+
+def get_map_stats(matches):
+    """Average Mully Rating per map, best map first.
+
+    `matches` is PlayerReport.matches. Returns a list of
+    (map name, average score, tier, games played).
+    """
 
     maps = defaultdict(list)
 
-    # потоковая функция
-    def fetch(match):
-
-        stats = match["stats"]
-
-        match_id = stats.get("Match Id")
-
-        if not match_id:
-            return None
-
-        advanced = analyze_match(match_id, player_id, headers)
-
-        if not advanced:
-            return None
-
-        map_name = (
-            stats.get("Map")
-            or stats.get("Map Name")
-            or stats.get("Game Map")
-            or "Unknown"
-        )
-
-        basic = {
-            "ADR": float(stats.get("ADR", 0)),
-            "KD": float(stats.get("K/D Ratio", 0)),
-            "KR": float(stats.get("K/R Ratio", 0)),
-            "MVP": float(stats.get("MVPs", 0))
-        }
-
-        stat = {}
-
-        stat["ADR_avg"] = basic["ADR"]
-        stat["KD_avg"] = basic["KD"]
-        stat["KR_avg"] = basic["KR"]
-        stat["MVP_avg"] = basic["MVP"]
-
-        stat["entry"] = advanced["entry_success"]
-
-        stat["1v1"] = clutch_rate(*advanced["1v1"])
-        stat["1v2"] = clutch_rate(*advanced["1v2"])
-        stat["1v3"] = clutch_rate(*advanced["1v3"])
-        stat["1v4"] = clutch_rate(*advanced["1v4"])
-        stat["1v5"] = clutch_rate(*advanced["1v5"])
-
-        stat["multi"] = multikill_score(
-            advanced["double"],
-            advanced["triple"],
-            advanced["quadra"],
-            advanced["ace"],
-            advanced["rounds"]
-        )
-
-        score = compute_score(stat)
-
-        return map_name, score
-
-    # параллельно
-    with ThreadPoolExecutor(max_workers=15) as executor:
-        results = list(executor.map(fetch, matches))
-
-    for item in results:
-        if not item:
-            continue
-        map_name, score = item
-        maps[map_name].append(score)
+    for match in matches:
+        maps[pretty_map_name(match.map)].append(match.score)
 
     result = []
 
-    for m, values in maps.items():
-        avg_score = sum(values) / len(values)
-        tier = score_tier(avg_score)
-        result.append((m, round(avg_score, 1), tier, len(values)))
+    for name, scores in maps.items():
+        avg_score = sum(scores) / len(scores)
+        result.append((name, round(avg_score, 1), score_tier(avg_score), len(scores)))
 
     result.sort(key=lambda x: x[1], reverse=True)
 

@@ -33,6 +33,34 @@ def multikill_score(double, triple, quadra, ace, rounds):
     return clamp(score * 20)
 
 
+def match_stat(match, advanced):
+    """Stats of a single match in the shape compute_score() expects.
+
+    `match` comes from player.get_matches(), `advanced` from
+    match.analyze_match().
+    """
+
+    stat = {
+        "ADR_avg": match["ADR"],
+        "KD_avg": match["KD"],
+        "KR_avg": match["KR"],
+        "MVP_avg": match["MVPs"],
+        "entry": advanced["entry_success"],
+        "multi": multikill_score(
+            advanced["double"],
+            advanced["triple"],
+            advanced["quadra"],
+            advanced["ace"],
+            advanced["rounds"]
+        )
+    }
+
+    for kind, clutch in advanced["clutches"].items():
+        stat[kind] = clutch_rate(clutch.wins, clutch.attempts)
+
+    return stat
+
+
 def compute_score(stats):
 
     adr = normalize(stats["ADR_avg"], 110, 3.1)
@@ -98,24 +126,37 @@ def score_tier(score):
     else:
         return "D"
 
+TIER_COLORS = {
+    "S": "🟣",
+    "A": "🔵",
+    "B": "🟢",
+    "C": "🟡",
+    "D": "🔴"
+}
+
+TIER_NAMES = {
+    "S": "Strong",
+    "A": "Great",
+    "B": "Good",
+    "C": "Average",
+    "D": "Weak"
+}
+
+
+def tier_color(tier):
+    return TIER_COLORS.get(tier, "⚪")
+
+
 def pretty_rank(tier):
 
-    ranks = {
-        "S": "🟣 S (Strong)",
-        "A": "🔵 A (Great)",
-        "B": "🟢 B (Good)",
-        "C": "🟡 C (Average)",
-        "D": "🔴 D (Weak)"
-    }
+    if tier not in TIER_NAMES:
+        return tier
 
-    return ranks.get(tier, tier)
+    return f"{tier_color(tier)} {tier} ({TIER_NAMES[tier]})"
 
-def progress_bar(score, length=20):
 
-    percent = int(score)
+def progress_bar(score, length=20, filled_char="▰", empty_char="▱"):
 
-    filled = int(length * percent / 100)
+    filled = int(length * clamp(score, 0, 100) / 100)
 
-    bar = "▰" * filled + "▱" * (length - filled)
-
-    return f"{bar}"
+    return filled_char * filled + empty_char * (length - filled)

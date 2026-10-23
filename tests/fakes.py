@@ -1,18 +1,28 @@
 """Fake FACEIT data for tests."""
 
 
-def player_stats(entry=0.5, clutch_1v1=(0, 0), double=0, triple=0, quadra=0, ace=0):
-    """FACEIT-like player_stats (FACEIT sends numbers as strings)."""
-    attempts, wins = clutch_1v1
-    return {
+def player_stats(entry=0.5, clutch_1v1=(0, 0), double=0, triple=0, quadra=0, ace=0,
+                 entry_duels=None, clutches=None):
+    """FACEIT-like player_stats (FACEIT sends numbers as strings).
+
+    clutch_1v1 / clutches values and entry_duels are (attempts, wins).
+    Entry Count / Entry Wins are only sent when entry_duels is given.
+    """
+    clutches = {"1v1": clutch_1v1, **(clutches or {})}
+    stats = {
         "Match Entry Success Rate": str(entry),
-        "1v1Count": str(attempts),
-        "1v1Wins": str(wins),
         "Double Kills": str(double),
         "Triple Kills": str(triple),
         "Quadro Kills": str(quadra),
         "Penta Kills": str(ace),
     }
+    for kind, (attempts, wins) in clutches.items():
+        stats[f"{kind}Count"] = str(attempts)
+        stats[f"{kind}Wins"] = str(wins)
+    if entry_duels is not None:
+        stats["Entry Count"] = str(entry_duels[0])
+        stats["Entry Wins"] = str(entry_duels[1])
+    return stats
 
 
 def match_round(players, rounds=24, number="1", map_name="de_mirage"):
@@ -27,9 +37,10 @@ def match_round(players, rounds=24, number="1", map_name="de_mirage"):
     }
 
 
-def history_item(match_id, map_name="de_mirage", adr=80, kd=1.0, kr=0.7, mvps=2, number="1"):
+def history_item(match_id, map_name="de_mirage", adr=80, kd=1.0, kr=0.7, mvps=2, number="1",
+                 kills=None, deaths=None):
     """One item of /players/{id}/games/cs2/stats."""
-    return {"stats": {
+    stats = {
         "Match Id": match_id,
         "Match Round": number,
         "Map": map_name,
@@ -37,7 +48,12 @@ def history_item(match_id, map_name="de_mirage", adr=80, kd=1.0, kr=0.7, mvps=2,
         "K/D Ratio": str(kd),
         "K/R Ratio": str(kr),
         "MVPs": str(mvps),
-    }}
+    }
+    if kills is not None:
+        stats["Kills"] = str(kills)
+    if deaths is not None:
+        stats["Deaths"] = str(deaths)
+    return {"stats": stats}
 
 
 class FakeClient:

@@ -1,6 +1,8 @@
+"""Player profile and match history from FACEIT."""
+
 from dataclasses import dataclass
 
-from src.faceit import to_float
+from mully_rating.faceit.client import to_float
 
 # FACEIT does not return more than 100 matches per request.
 MAX_MATCHES = 100
@@ -76,6 +78,8 @@ def get_matches(client, player_id, limit=30):
                 or "Unknown"
             ),
             "ADR": to_float(stats.get("ADR")),
+            "kills": to_float(stats.get("Kills")),
+            "deaths": to_float(stats.get("Deaths")),
             "KD": to_float(stats.get("K/D Ratio")),
             "KR": to_float(stats.get("K/R Ratio")),
             "MVPs": to_float(stats.get("MVPs")),

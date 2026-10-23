@@ -1,6 +1,6 @@
 import pytest
 
-from src.match import clear_cache
+from mully_rating.faceit.matches import clear_cache
 
 
 @pytest.fixture(autouse=True)

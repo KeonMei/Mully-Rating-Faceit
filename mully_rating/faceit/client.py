@@ -1,3 +1,5 @@
+"""HTTP client for the FACEIT Data API."""
+
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry

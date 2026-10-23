@@ -1,11 +1,13 @@
+"""Analyses a player: downloads matches and builds a PlayerReport."""
+
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 
-from src.faceit import FaceitError
-from src.match import CLUTCH_TYPES, analyze_match
-from src.player import get_matches, get_player_info
-from src.score import clutch_rate, compute_score, match_stat, multikill_score
-from src.score import pretty_rank, progress_bar, score_tier
+from mully_rating.faceit.client import FaceitError
+from mully_rating.faceit.matches import analyze_match
+from mully_rating.faceit.players import get_matches, get_player_info
+from mully_rating.rating.formula import MatchTotals, rate
+from mully_rating.rating.tiers import pretty_rank, progress_bar, score_tier
 
 # One pool for the whole bot: limits parallel FACEIT requests even when
 # several users ask at the same time, so we hit rate limits less often.
@@ -20,6 +22,8 @@ class AnalysisError(Exception):
 class MatchResult:
     map: str
     score: float
+    # Raw stats of the match; maps.py adds them up per map.
+    totals: MatchTotals | None = None
 
 
 @dataclass
@@ -36,6 +40,10 @@ class PlayerReport:
     matches_requested: int
     # Analysed matches, oldest first.
     matches: list[MatchResult] = field(default_factory=list)
+    # Combat / multi / entry / clutch, each 0..100 (see rating/formula.py).
+    components: dict = field(default_factory=dict)
+    # Raw stats behind the score: adr, kd, kr, mvp, entry, clutch, multi.
+    stats: dict = field(default_factory=dict)
 
     @property
     def matches_count(self):
@@ -70,12 +78,7 @@ def analyze_player(client, nickname, match_limit=30):
 
     advanced_results = list(_pool.map(fetch_advanced, matches))
 
-    totals = {
-        "ADR": 0, "KD": 0, "KR": 0, "MVP": 0, "entry": 0,
-        "double": 0, "triple": 0, "quadra": 0, "ace": 0, "rounds": 0,
-    }
-    clutch_totals = {kind: [0, 0] for kind in CLUTCH_TYPES}  # [wins, attempts]
-
+    totals = MatchTotals()
     results = []
 
     for match, advanced in zip(matches, advanced_results):
@@ -83,50 +86,22 @@ def analyze_player(client, nickname, match_limit=30):
         if not advanced:
             continue
 
-        totals["ADR"] += match["ADR"]
-        totals["KD"] += match["KD"]
-        totals["KR"] += match["KR"]
-        totals["MVP"] += match["MVPs"]
-        totals["entry"] += advanced["entry_success"]
+        match_totals = MatchTotals.from_match(match, advanced)
 
-        for key in ("double", "triple", "quadra", "ace", "rounds"):
-            totals[key] += advanced[key]
-
-        for kind, clutch in advanced["clutches"].items():
-            clutch_totals[kind][0] += clutch.wins
-            clutch_totals[kind][1] += clutch.attempts
+        totals = totals + match_totals
 
         results.append(MatchResult(
             map=match["map"],
-            score=compute_score(match_stat(match, advanced))
+            score=rate(match_totals).score,
+            totals=match_totals
         ))
 
     if not results:
         # Every match request failed: FACEIT is down or rate-limits us.
         raise FaceitError("Could not load details of any match")
 
-    count = len(results)
-
-    stats = {
-        "ADR_avg": totals["ADR"] / count,
-        "KD_avg": totals["KD"] / count,
-        "KR_avg": totals["KR"] / count,
-        "MVP_avg": totals["MVP"] / count,
-        "entry": totals["entry"] / count,
-        "multi": multikill_score(
-            totals["double"],
-            totals["triple"],
-            totals["quadra"],
-            totals["ace"],
-            totals["rounds"]
-        )
-    }
-
-    for kind, (wins, attempts) in clutch_totals.items():
-        stats[kind] = clutch_rate(wins, attempts)
-
-    score = compute_score(stats)
-    tier = score_tier(score)
+    rating = rate(totals)
+    tier = score_tier(rating.score)
 
     # FACEIT returns newest matches first; charts read better oldest first.
     results.reverse()
@@ -137,10 +112,12 @@ def analyze_player(client, nickname, match_limit=30):
         elo=player.elo,
         level=player.level,
         flag=country_flag(player.country),
-        score=score,
+        score=rating.score,
         tier=tier,
         rank=pretty_rank(tier),
-        bar=progress_bar(score),
+        bar=progress_bar(rating.score),
         matches_requested=match_limit,
         matches=results,
+        components=rating.components,
+        stats=rating.stats,
     )

@@ -1,7 +1,7 @@
 import pytest
 import requests
 
-from src.faceit import BASE_URL, TIMEOUT, FaceitClient, FaceitError, to_float, to_int
+from mully_rating.faceit.client import BASE_URL, TIMEOUT, FaceitClient, FaceitError, to_float, to_int
 
 
 class FakeResponse:

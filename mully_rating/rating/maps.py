@@ -1,6 +1,8 @@
+"""Mully Rating on each map."""
+
 from collections import defaultdict
 
-from src.score import score_tier
+from mully_rating.rating.tiers import score_tier
 
 
 def pretty_map_name(name):

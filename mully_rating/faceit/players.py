@@ -1,6 +1,8 @@
+"""Player profile and match history from FACEIT."""
+
 from dataclasses import dataclass
 
-from src.faceit import to_float
+from mully_rating.faceit.client import to_float
 
 # FACEIT does not return more than 100 matches per request.
 MAX_MATCHES = 100

@@ -1,5 +1,5 @@
-from src.faceit import FaceitError
-from src.match import analyze_match
+from mully_rating.faceit.client import FaceitError
+from mully_rating.faceit.matches import analyze_match
 
 from fakes import FakeClient, match_round, player_stats
 

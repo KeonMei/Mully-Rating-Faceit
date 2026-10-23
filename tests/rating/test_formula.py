@@ -1,16 +1,13 @@
 import pytest
 
-from src.match import Clutch
-from src.score import (
+from mully_rating.faceit.matches import Clutch
+from mully_rating.rating.formula import (
     clamp,
     clutch_rate,
     compute_score,
     match_stat,
     multikill_score,
     normalize,
-    pretty_rank,
-    progress_bar,
-    score_tier,
 )
 
 
@@ -49,27 +46,6 @@ def test_score_is_in_range_and_grows_with_better_stats():
 
     assert 0 <= weak < average < strong <= 100
     assert compute_score(stats(adr=0, kd=0, kr=0, mvp=0, entry=0, clutch=0, multi=0)) == 0
-
-
-@pytest.mark.parametrize("score, tier", [
-    (100, "S"), (90, "S"), (89.9, "A"), (75, "A"), (60, "B"), (45, "C"), (44.9, "D"), (0, "D"),
-])
-def test_score_tier(score, tier):
-    assert score_tier(score) == tier
-
-
-def test_pretty_rank():
-    assert pretty_rank("S") == "🟣 S (Strong)"
-    assert pretty_rank("D") == "🔴 D (Weak)"
-    assert pretty_rank("?") == "?"
-
-
-def test_progress_bar():
-    assert progress_bar(0) == "▱" * 20
-    assert progress_bar(100) == "▰" * 20
-    assert progress_bar(50) == "▰" * 10 + "▱" * 10
-    assert progress_bar(150, length=10, filled_char="#", empty_char=".") == "#" * 10
-    assert len(progress_bar(37.9)) == 20
 
 
 def test_match_stat_uses_wins_divided_by_attempts():

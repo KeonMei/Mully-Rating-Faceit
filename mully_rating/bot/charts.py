@@ -1,3 +1,5 @@
+"""Trend chart image (PNG) of per-match Mully Rating."""
+
 from io import BytesIO
 
 # Figure is used directly instead of pyplot: pyplot keeps global state

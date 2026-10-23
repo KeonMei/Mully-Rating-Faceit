@@ -42,7 +42,7 @@ def report_text(report):
     if report.matches_count < report.matches_requested:
         analyzed += f" of {report.matches_requested}"
 
-    return (
+    text = (
         f"👤 {report.nickname}\n"
         f"{profile}\n\n"
         f"Matches analyzed: {analyzed}\n\n"
@@ -50,6 +50,20 @@ def report_text(report):
         f"{report.bar}\n\n"
         f"Rank: {report.rank}"
     )
+
+    if report.components:
+        parts = report.components
+        text += (
+            "\n\nBreakdown (50 = average player):\n"
+            f"Combat {parts['combat']} · Multikills {parts['multi']}\n"
+            f"Entry {parts['entry']} · Clutch {parts['clutch']}"
+        )
+
+    if report.stats:
+        stats = report.stats
+        text += f"\n\nADR {stats['adr']:.1f} · K/D {stats['kd']:.2f} · K/R {stats['kr']:.2f}"
+
+    return text
 
 
 def maps_text(report):

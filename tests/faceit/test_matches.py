@@ -1,5 +1,5 @@
 from mully_rating.faceit.client import FaceitError
-from mully_rating.faceit.matches import analyze_match
+from mully_rating.faceit.matches import Duels, analyze_match
 
 from fakes import FakeClient, match_round, player_stats
 
@@ -63,3 +63,18 @@ def test_bad_numbers_become_zero():
 
     assert result["double"] == 0
     assert result["entry_success"] == 0
+
+
+def test_entry_duels_are_read_when_present():
+    client = FakeClient({"/matches/m1/stats": {"rounds": [match_round({
+        "alice": player_stats(entry=0.75, entry_duels=(4, 3)),
+        "bob": player_stats(entry=0.5),
+    })]}})
+
+    alice = analyze_match(client, "m1", "alice")
+    bob = analyze_match(client, "m1", "bob")
+
+    assert alice["entry"] == Duels(attempts=4, wins=3)
+    assert alice["entry_success"] == 0.75
+    assert bob["entry"] is None  # FACEIT sent only the rate
+    assert bob["entry_success"] == 0.5

@@ -1,7 +1,7 @@
 import pytest
 
-from src.analyzer import AnalysisError, analyze_player, country_flag
-from src.faceit import FaceitError
+from mully_rating.analyzer import AnalysisError, analyze_player, country_flag
+from mully_rating.faceit.client import FaceitError
 
 from fakes import FakeClient, history_item, match_round, player_stats
 

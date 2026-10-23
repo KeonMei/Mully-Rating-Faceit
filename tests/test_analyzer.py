@@ -91,3 +91,25 @@ def test_country_flag():
     assert country_flag("") == ""
     assert country_flag("unknown") == ""
     assert country_flag(None) == ""
+
+
+def test_report_has_breakdown_and_totals_based_kd():
+    client = make_client(
+        history=[
+            history_item("m1", kd=3.0, kills=30, deaths=10),
+            history_item("m2", kd=0.5, kills=10, deaths=20),
+        ],
+        matches={
+            "m1": {"pid-1": player_stats(entry_duels=(4, 3))},
+            "m2": {"pid-1": player_stats(entry_duels=(2, 0))},
+        },
+    )
+
+    report = analyze_player(client, "alice", 10)
+
+    assert set(report.components) == {"combat", "multi", "entry", "clutch"}
+    assert all(0 <= value <= 100 for value in report.components.values())
+    assert report.stats["kd"] == pytest.approx(40 / 30)
+    # 3 of 6 opening duels won plus 4 imaginary average duels.
+    assert report.stats["entry"] == pytest.approx(0.5)
+    assert all(match.totals is not None for match in report.matches)

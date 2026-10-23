@@ -1,8 +1,10 @@
+"""Detailed stats of one match (entry, clutches, multikills), with a cache."""
+
 import threading
 from collections import OrderedDict
 from typing import NamedTuple
 
-from src.faceit import FaceitError, to_float, to_int
+from mully_rating.faceit.client import FaceitError, to_float, to_int
 
 CLUTCH_TYPES = ("1v1", "1v2", "1v3", "1v4", "1v5")
 

@@ -41,10 +41,12 @@ WEIGHTS = {
     "clutch": 0.05,
 }
 
-# Share of clutches an average player wins.
+# Share of clutches an average player wins. 1v1 is below 50% because
+# a player who turns a 1v2 into a 1v1 is counted as being in a 1v2;
+# the 1v1 is recorded for the opponent who was left alone.
 EXPECTED_CLUTCH_WIN_RATE = {
-    "1v1": 0.50,
-    "1v2": 0.22,
+    "1v1": 0.40,
+    "1v2": 0.20,
     "1v3": 0.08,
     "1v4": 0.03,
     "1v5": 0.01,

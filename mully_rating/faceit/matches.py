@@ -16,18 +16,32 @@ _cache = OrderedDict()
 _cache_lock = threading.Lock()
 
 
-class Clutch(NamedTuple):
+class Duels(NamedTuple):
+    """How many times a player was in a situation and how many they won."""
     attempts: int
     wins: int
+
+
+def _parse_entry(player_stats):
+    """Opening duels, or None if FACEIT did not send the counts."""
+
+    if player_stats.get("Entry Count") is None:
+        return None
+
+    return Duels(
+        attempts=to_int(player_stats.get("Entry Count")),
+        wins=to_int(player_stats.get("Entry Wins")),
+    )
 
 
 def _parse_player(player_stats, rounds):
 
     return {
         "rounds": rounds,
+        "entry": _parse_entry(player_stats),
         "entry_success": to_float(player_stats.get("Match Entry Success Rate")),
         "clutches": {
-            kind: Clutch(
+            kind: Duels(
                 attempts=to_int(player_stats.get(f"{kind}Count")),
                 wins=to_int(player_stats.get(f"{kind}Wins")),
             )

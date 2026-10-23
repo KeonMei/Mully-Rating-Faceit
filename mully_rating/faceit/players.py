@@ -78,6 +78,8 @@ def get_matches(client, player_id, limit=30):
                 or "Unknown"
             ),
             "ADR": to_float(stats.get("ADR")),
+            "kills": to_float(stats.get("Kills")),
+            "deaths": to_float(stats.get("Deaths")),
             "KD": to_float(stats.get("K/D Ratio")),
             "KR": to_float(stats.get("K/R Ratio")),
             "MVPs": to_float(stats.get("MVPs")),

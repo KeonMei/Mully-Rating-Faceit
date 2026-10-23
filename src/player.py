@@ -1,77 +1,84 @@
-import requests
+from dataclasses import dataclass
+
+from src.faceit import to_float
+
+# FACEIT does not return more than 100 matches per request.
+MAX_MATCHES = 100
 
 
-def get_player_info(nickname, headers):
+@dataclass
+class Player:
+    player_id: str
+    nickname: str
+    avatar: str | None
+    elo: int | str
+    level: int | str
+    country: str
 
-    url = "https://open.faceit.com/data/v4/players"
 
-    params = {
-        "nickname": nickname
-    }
+def get_player_info(client, nickname):
+    """Look up a player by nickname. Returns Player or None if not found."""
 
-    response = requests.get(url, headers=headers, params=params)
+    data = client.get("/players", {"nickname": nickname})
 
-    if response.status_code != 200:
+    if not data or "player_id" not in data:
         return None
 
-    data = response.json()
+    avatar = (data.get("avatar") or "").strip()
 
-    if "errors" in data:
-        return None
-
-    player_id = data["player_id"]
-
-    avatar = data.get("avatar")
-
-    if avatar:
-        avatar = avatar.strip()
-
-    if not avatar or not avatar.startswith("http"):
+    if not avatar.startswith("http"):
         avatar = None
-
-    country = data.get("country", "unknown")
 
     cs2 = data.get("games", {}).get("cs2", {})
 
-    elo = cs2.get("faceit_elo", "N/A")
-    level = cs2.get("skill_level", "N/A")
+    return Player(
+        player_id=data["player_id"],
+        nickname=data.get("nickname") or nickname,
+        avatar=avatar,
+        elo=cs2.get("faceit_elo", "N/A"),
+        level=cs2.get("skill_level", "N/A"),
+        country=data.get("country", ""),
+    )
 
-    return player_id, avatar, elo, level, country
 
+def get_matches(client, player_id, limit=30):
+    """Basic stats of the player's last `limit` CS2 matches, newest first."""
 
-def get_matches(player_id, headers, limit=30):
+    limit = max(1, min(limit, MAX_MATCHES))
 
-    url = f"https://open.faceit.com/data/v4/players/{player_id}/games/cs2/stats"
+    data = client.get(
+        f"/players/{player_id}/games/cs2/stats",
+        {"limit": limit, "offset": 0}
+    )
 
-    params = {
-        "limit": limit,
-        "offset": 0
-    }
-
-    response = requests.get(url, headers=headers, params=params)
-
-    if response.status_code != 200:
-        raise Exception(f"Match API error: {response.status_code}")
-
-    data = response.json()
-
-    if "items" not in data:
-        raise Exception("No matches found")
+    if not data:
+        return []
 
     matches = []
 
-    for match in data["items"]:
+    for item in data.get("items", []):
 
-        stats = match["stats"]
+        stats = item.get("stats", {})
+
+        match_id = stats.get("Match Id")
+
+        if not match_id:
+            continue
 
         matches.append({
-            "match_id": stats.get("Match Id"),
-            "ADR": float(stats.get("ADR", 0)),
-            "KD": float(stats.get("K/D Ratio", 0)),
-            "Kills": float(stats.get("Kills", 0)),
-            "Deaths": float(stats.get("Deaths", 0)),
-            "KR": float(stats.get("K/R Ratio", 0)),
-            "MVPs": float(stats.get("MVPs", 0))
+            "match_id": match_id,
+            # Map number inside a BO3 series ("1", "2", ...).
+            "match_round": stats.get("Match Round"),
+            "map": (
+                stats.get("Map")
+                or stats.get("Map Name")
+                or stats.get("Game Map")
+                or "Unknown"
+            ),
+            "ADR": to_float(stats.get("ADR")),
+            "KD": to_float(stats.get("K/D Ratio")),
+            "KR": to_float(stats.get("K/R Ratio")),
+            "MVPs": to_float(stats.get("MVPs")),
         })
 
     return matches

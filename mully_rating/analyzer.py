@@ -1,11 +1,13 @@
+"""Analyses a player: downloads matches and builds a PlayerReport."""
+
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 
-from src.faceit import FaceitError
-from src.match import CLUTCH_TYPES, analyze_match
-from src.player import get_matches, get_player_info
-from src.score import clutch_rate, compute_score, match_stat, multikill_score
-from src.score import pretty_rank, progress_bar, score_tier
+from mully_rating.faceit.client import FaceitError
+from mully_rating.faceit.matches import CLUTCH_TYPES, analyze_match
+from mully_rating.faceit.players import get_matches, get_player_info
+from mully_rating.rating.formula import clutch_rate, compute_score, match_stat, multikill_score
+from mully_rating.rating.tiers import pretty_rank, progress_bar, score_tier
 
 # One pool for the whole bot: limits parallel FACEIT requests even when
 # several users ask at the same time, so we hit rate limits less often.

@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# "." for the mully_rating package, "tests" for the shared tests/fakes.py.
+pythonpath = [".", "tests"]

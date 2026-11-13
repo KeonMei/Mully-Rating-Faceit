@@ -28,12 +28,13 @@ Why totals: with per-match averages one 30–10 game (K/D 3.0) and one
 two games is 40 / 30 = **1.33**. A 13–2 stomp would also count as much
 as a 16–14 overtime game.
 
-The same code rates a single match (the trend chart), all matches on
-one map (the map table) and all analysed matches (the main rating).
+The same code rates a single match (the "Rating by match" chart), all
+matches on one map (the map table) and all analysed matches (the main
+rating).
 
 Because of that, the main rating is usually not the plain average of
-the trend chart: a short 13–2 game weighs less than a 16–14 one, and a
-single match is capped at 0 and 100 while the totals are not.
+the per-match chart: a short 13–2 game weighs less than a 16–14 one,
+and a single match is capped at 0 and 100 while the totals are not.
 
 ### Clutches
 
@@ -125,9 +126,8 @@ score  = 100 × (80% combat + 10% multikills + 5% entry + 5% clutch)
 These are the weights of the original formula. Combat decides most of
 the rating, and the other parts move it a few points.
 
-The bot shows the four parts on the player card ("Breakdown"), each
-on the same 0–100 scale, so a player can see where their score comes
-from.
+The website shows the four parts in the "Breakdown" card, each on the
+same 0–100 scale, so a player can see where their score comes from.
 
 ### Worked example
 
@@ -230,5 +230,5 @@ still land in the expected tiers.
   A level 4 and a level 10 player with the same stats get the same
   rating.
 - Utility usage, trading, positioning and economy are not in the
-  FACEIT stats the bot reads, so the rating can not see them.
+  FACEIT stats the rating reads, so it can not see them.
 - 10 matches are a small sample; 30+ give a much more stable rating.

@@ -71,7 +71,7 @@ def report_to_json(report):
         } if stats else {},
         # What an average FACEIT player has, for comparison on the page.
         "averages": {name: average for name, (_, average, _) in ANCHORS.items()},
-        # Oldest match first, like the trend chart in the bot.
+        # Oldest match first, as the per-match chart on the page shows them.
         "matches": [
             {"map": pretty_map_name(match.map), "score": match.score}
             for match in report.matches

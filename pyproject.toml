@@ -1,3 +1,26 @@
+# Vercel reads the website's dependencies from this file (it prefers
+# pyproject.toml over requirements.txt). The website only needs
+# `requests`, so the function stays small and starts fast.
+# The Telegram bot is installed with requirements.txt instead.
+[project]
+name = "mully-rating"
+version = "1.0.0"
+description = "FACEIT CS2 Mully Rating: Telegram bot and website"
+requires-python = ">=3.11"
+dependencies = [
+    "requests==2.34.2",
+]
+
+# Only the dependencies above are installed (uv on Vercel); the project
+# itself is not built as a package.
+[tool.uv]
+package = false
+
+# If someone runs `pip install .`, install just the mully_rating package
+# (the root also has api/, public/, tests/ ... which are not packages).
+[tool.setuptools.packages.find]
+include = ["mully_rating*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 # "." for the mully_rating package, "tests" for the shared tests/fakes.py.

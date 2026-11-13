@@ -1,6 +1,6 @@
 import pytest
 
-from mully_rating.rating.tiers import pretty_rank, progress_bar, score_tier, tier_color
+from mully_rating.rating.tiers import TIER_NAMES, TIER_THRESHOLDS, score_tier
 
 
 @pytest.mark.parametrize("score, tier", [
@@ -10,20 +10,7 @@ def test_score_tier(score, tier):
     assert score_tier(score) == tier
 
 
-def test_pretty_rank():
-    assert pretty_rank("S") == "🟣 S (Strong)"
-    assert pretty_rank("D") == "🔴 D (Weak)"
-    assert pretty_rank("?") == "?"
-
-
-def test_progress_bar():
-    assert progress_bar(0) == "▱" * 20
-    assert progress_bar(100) == "▰" * 20
-    assert progress_bar(50) == "▰" * 10 + "▱" * 10
-    assert progress_bar(150, length=10, filled_char="#", empty_char=".") == "#" * 10
-    assert len(progress_bar(37.9)) == 20
-
-
-def test_tier_color():
-    assert tier_color("A") == "🔵"
-    assert tier_color("?") == "⚪"
+def test_every_tier_has_a_name():
+    assert [tier for tier, _ in TIER_THRESHOLDS] == list(TIER_NAMES)
+    assert TIER_NAMES["S"] == "Strong"
+    assert TIER_NAMES["D"] == "Weak"

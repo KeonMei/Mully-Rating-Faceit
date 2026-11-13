@@ -7,9 +7,9 @@ from mully_rating.faceit.client import FaceitError
 from mully_rating.faceit.matches import analyze_match
 from mully_rating.faceit.players import get_matches, get_player_info
 from mully_rating.rating.formula import MatchTotals, rate
-from mully_rating.rating.tiers import pretty_rank, progress_bar, score_tier
+from mully_rating.rating.tiers import score_tier
 
-# One pool for the whole bot: limits parallel FACEIT requests even when
+# One pool for the whole app: limits parallel FACEIT requests even when
 # several users ask at the same time, so we hit rate limits less often.
 _pool = ThreadPoolExecutor(max_workers=10, thread_name_prefix="faceit")
 
@@ -36,8 +36,6 @@ class PlayerReport:
     flag: str
     score: float
     tier: str
-    rank: str
-    bar: str
     matches_requested: int
     # Analysed matches, oldest first.
     matches: list[MatchResult] = field(default_factory=list)
@@ -116,8 +114,6 @@ def analyze_player(client, nickname, match_limit=30):
         flag=country_flag(player.country),
         score=rating.score,
         tier=tier,
-        rank=pretty_rank(tier),
-        bar=progress_bar(rating.score),
         matches_requested=match_limit,
         matches=results,
         components=rating.components,

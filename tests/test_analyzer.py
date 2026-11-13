@@ -46,7 +46,7 @@ def test_report():
     assert report.matches_count == 2
     assert report.matches_requested == 30
     assert 0 <= report.score <= 100
-    assert report.rank.startswith(("🟣", "🔵", "🟢", "🟡", "🔴"))
+    assert report.tier in ("S", "A", "B", "C", "D")
 
     # Oldest match first, map names are kept (they used to be "Unknown").
     assert [m.map for m in report.matches] == ["de_mirage", "de_inferno"]

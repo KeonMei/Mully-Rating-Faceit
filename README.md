@@ -5,7 +5,7 @@
 <h1 align="center">FACEIT Mully Rating</h1>
 
 <p align="center">
-  A Telegram bot and a website that rate FACEIT CS2 players from 0 to 100,
+  A website that rates FACEIT CS2 players from 0 to 100,
   using more than K/D and ADR.
 </p>
 
@@ -17,18 +17,17 @@
 
 ---
 
-Send the bot a FACEIT nickname, or type it on the website, and it
-analyses the player's last 10–100 CS2 matches. It combines **combat** (ADR, K/D, K/R, MVPs),
+Type a FACEIT nickname and the site analyses the player's last 10–100
+CS2 matches. It combines **combat** (ADR, K/D, K/R, MVPs),
 **multikills**, **opening duels** and **clutches** into one
 **Mully Rating**, where **50 is an average FACEIT player**.
 
 ## Contents
 
-- [What the bot shows](#-what-the-bot-shows)
-- [Website](#-website)
+- [What the website shows](#-what-the-website-shows)
 - [How the Mully Rating works](#-how-the-mully-rating-works)
-- [Quick start](#️-quick-start)
-- [Deploy the website to Vercel](#-deploy-the-website-to-vercel)
+- [Run it locally](#️-run-it-locally)
+- [Deploy to Vercel](#-deploy-to-vercel)
 - [Tests](#-tests)
 - [Tuning the rating](#-tuning-the-rating)
 - [Project structure](#-project-structure)
@@ -37,82 +36,28 @@ analyses the player's last 10–100 CS2 matches. It combines **combat** (ADR, K/
 
 ---
 
-## 📊 What the bot shows
+## 🌐 What the website shows
 
-**1. Send a nickname or a profile link**, then pick how many matches to
-analyse: 10, 30, 50 or 100.
+Enter a nickname or a faceit.com profile link, pick 10, 30, 50 or 100
+matches and get:
 
-```text
-https://www.faceit.com/en/players/your_nickname
-```
+- **the player card**: avatar, country, level and ELO,
+- **the Mully Rating** with its tier (S–D),
+- **the breakdown**: combat, multikills, entry and clutch, each from 0
+  to 100, with a mark at 50 for an average player,
+- **stats** (ADR, K/D, kills per round, MVPs, opening duels, clutches,
+  multikills) next to what an average player has,
+- **the rating of every match** on an interactive chart,
+- **the rating on each map** and how many games it is based on.
 
-**2. Player card**: the rating, tier and where the score comes from.
-
-```text
-👤 Player
-🇰🇿 | Level 10 | 2310 ELO
-
-Matches analyzed: 30
-
-Mully Rating: 73.9
-▰▰▰▰▰▰▰▰▰▰▰▰▰▰▱▱▱▱▱▱
-
-Rank: 🟢 B (Good)
-
-Breakdown (50 = average player):
-Combat 76 · Multikills 77
-Entry 41 · Clutch 66
-
-ADR 91.4 · K/D 1.31 · K/R 0.95
-```
-
-**3. Trend 📈**: the rating of every match, oldest to newest.
-
-<p align="center">
-  <img src="assets/trend-example.png" alt="Example of the trend chart" width="560">
-</p>
-
-**4. Maps 🗺**: the rating on each map and how many games it is based on.
-
-```text
-🗺 Map Mully Rating — Player
-Last 30 matches
-
-🔵 Inferno  83.9 ████████░░ 3
-🔵 Mirage   80.5 ████████░░ 6
-🟢 Nuke     73.2 ███████░░░ 4
-🟢 Ancient  70.9 ███████░░░ 6
-🟢 Anubis   67.2 ██████░░░░ 4
-🟢 Dust2    66.8 ██████░░░░ 7
-```
-
-*The examples above are generated from sample data.*
-
----
-
-## 🌐 Website
-
-The same rating as a web page: enter a nickname or a profile link, pick
-10–100 matches and get the player card, the breakdown, stats next to an
-average player, an interactive chart of every match and the map table.
-Results have their own links (`/?player=nickname&matches=30`) to share
-with friends.
+Every result has its own link (`/?player=nickname&matches=30`) to share
+with friends. The page works on phones too.
 
 <p align="center">
   <img src="assets/website-example.png" alt="The Mully Rating website" width="720">
 </p>
 
 *Screenshot made with sample data.*
-
-The page is plain HTML, CSS and JavaScript in [`public/`](public/). It
-gets its data from one Python function, `/api/rating`, which uses the
-same rating code as the bot.
-
-Run it on your computer (needs `FACEIT_API_KEY` in `.env`):
-
-```bash
-python scripts/serve_web.py      # → http://localhost:8000
-```
 
 ---
 
@@ -148,11 +93,10 @@ version of the formula: **[docs/rating.md](docs/rating.md)**.
 
 ---
 
-## ⚙️ Quick start
+## ⚙️ Run it locally
 
-You need **Python 3.11+**, a [FACEIT API key](https://developers.faceit.com)
-(server-side key) and a Telegram bot token from
-[@BotFather](https://t.me/BotFather).
+You need **Python 3.11+** and a [FACEIT API key](https://developers.faceit.com)
+(server-side key).
 
 ```bash
 # 1. Clone
@@ -165,34 +109,28 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
 # 3. Configure
-cp .env.example .env             # then put your keys into .env
+cp .env.example .env             # then put your FACEIT key into .env
 
 # 4. Run
-python bot.py
+python scripts/serve_web.py      # → http://localhost:8000
 ```
 
-| Variable | Description |
-| -------- | ----------- |
-| `FACEIT_API_KEY` | FACEIT Data API key |
-| `TG_BOT_TOKEN` | Telegram bot token |
-
-If a variable is missing, the bot stops with a message saying which one.
+The local server serves the pages from `public/` and the same
+`/api/rating` code that runs on Vercel.
 
 ---
 
-## 🚀 Deploy the website to Vercel
+## 🚀 Deploy to Vercel
 
 The website runs on [Vercel](https://vercel.com) for free (the Hobby
-plan is for personal, non-commercial projects). The Telegram bot is a
-separate program: it needs a server where `python bot.py` keeps
-running, see [Quick start](#️-quick-start).
+plan is for personal, non-commercial projects).
 
 1. On vercel.com, sign in with GitHub and choose **Add New… → Project**.
 2. Import the `Mully-Rating-Faceit` repository. Leave the settings as
    they are: `vercel.json` already selects the **Other** preset, the
    pages come from `public/` and there is no build command.
 3. Open **Environment Variables** and add `FACEIT_API_KEY` with your
-   FACEIT key. The Telegram token is not needed here.
+   FACEIT key.
 4. Press **Deploy**. The site opens at `https://<project>.vercel.app`.
 
 After that every push to `main` updates the site, and every pull request
@@ -202,8 +140,7 @@ How it is set up:
 
 - `api/rating.py` becomes the `/api/rating` function. Vercel installs
   only what `pyproject.toml` lists (just `requests`), so the function is
-  small and starts fast; the bot's packages from `requirements.txt` are
-  not installed there.
+  small and starts fast.
 - Answers are cached by Vercel's CDN for 10 minutes, so popular players
   are not downloaded from FACEIT again on every visit.
 - `vercel.json` lets one analysis run for up to 60 seconds. That is
@@ -218,10 +155,10 @@ pip install -r requirements-dev.txt
 python -m pytest
 ```
 
-The tests use a fake FACEIT API and a fake Telegram server, so they
-need no keys and no internet. They also check the website's API and
-the files Vercel reads. They also run on GitHub Actions for
-every push (Python 3.11 and 3.14).
+The tests use a fake FACEIT API, so they need no keys and no internet.
+They cover the rating formula, the FACEIT client, the website's API,
+the local server and the files Vercel reads. They also run on GitHub
+Actions for every push (Python 3.11 and 3.14).
 
 ---
 
@@ -245,39 +182,30 @@ table built from the 10th percentile, median and 95th percentile.
 
 ```text
 Mully-Rating-Faceit/
-├── bot.py                    # bot entry point: python bot.py
+├── public/                   # the website: index.html, style.css, app.js
+├── api/
+│   └── rating.py             # Vercel function → /api/rating
 ├── mully_rating/
-│   ├── config.py             # reads FACEIT_API_KEY / TG_BOT_TOKEN
 │   ├── analyzer.py           # downloads matches → PlayerReport
 │   ├── nickname.py           # nickname / profile link parsing
 │   ├── faceit/               # everything that talks to FACEIT
 │   │   ├── client.py         #   HTTP session, timeouts, retries
 │   │   ├── players.py        #   profile and match history
 │   │   └── matches.py        #   match details + cache
-│   ├── rating/               # the math, no network or Telegram
+│   ├── rating/               # the math, no network
 │   │   ├── formula.py        #   the Mully Rating formula
-│   │   ├── tiers.py          #   S–D tiers, emoji, progress bar
+│   │   ├── tiers.py          #   S–D tiers and their names
 │   │   └── maps.py           #   rating per map
-│   ├── bot/                  # the Telegram bot
-│   │   ├── app.py            #   builds the bot, registers handlers
-│   │   ├── handlers.py       #   messages and button taps
-│   │   ├── keyboards.py      #   buttons and their data
-│   │   ├── messages.py       #   texts the bot sends
-│   │   ├── reports.py        #   recent analyses for Trend / Maps
-│   │   └── charts.py         #   trend chart image
 │   └── web/
 │       └── api.py            # JSON API for the website
-├── api/
-│   └── rating.py             # Vercel function → /api/rating
-├── public/                   # the website: index.html, style.css, app.js
 ├── scripts/
-│   ├── calibrate.py          # suggests rating anchors from real players
-│   └── serve_web.py          # runs the website locally
+│   ├── serve_web.py          # runs the website locally
+│   └── calibrate.py          # suggests rating anchors from real players
 ├── tests/                    # same layout as mully_rating/
 ├── docs/
 │   └── rating.md             # how the rating works
 ├── assets/                   # logo and README images
-├── requirements.txt          # bot dependencies
+├── requirements.txt          # for the local server and scripts
 ├── requirements-dev.txt      # + pytest
 ├── pyproject.toml            # website dependencies + pytest settings
 ├── vercel.json               # Vercel settings
@@ -288,31 +216,27 @@ Mully-Rating-Faceit/
 
 ## 🛠️ Under the hood
 
-- **Several users at once.** FACEIT requests run in worker threads and
-  Telegram updates are handled concurrently, so one long analysis does
-  not freeze the bot.
 - **Fast and polite to the API.** One keep-alive HTTP session, up to 10
   parallel requests, automatic retry with backoff on rate limits (429)
   and server errors, 10-second timeouts.
-- **Caching.** Match details are cached in memory (up to 2000 matches,
-  all 10 players each). The Trend and Maps buttons reuse the last
-  analysis for 10 minutes instead of downloading it again.
-- **Stateless buttons.** Every button carries the nickname and match
-  count, so buttons keep working after a restart.
-- **Clear errors.** Unknown player, no CS2 matches and FACEIT being down
-  each get their own message.
+- **Caching.** Match details are cached in memory while the function is
+  warm (up to 2000 matches, all 10 players each), and whole answers are
+  cached by Vercel's CDN for 10 minutes.
 - **Light website.** No frameworks and no build step; the chart is drawn
   in the browser, so the Vercel function only needs `requests`.
+- **Shareable results.** The nickname and match count live in the page
+  address, so a copied link opens the same result.
+- **Clear errors.** Unknown player, no CS2 matches and FACEIT being down
+  each get their own message.
 
-Tech stack: Python, [python-telegram-bot](https://python-telegram-bot.org),
-requests, matplotlib, pytest; the website is plain HTML, CSS and
-JavaScript on Vercel.
+Tech stack: Python, requests and pytest for the API; plain HTML, CSS
+and JavaScript for the page; hosted on Vercel.
 
 ---
 
 ## 📈 Roadmap
 
-- [ ] Player comparison (`/compare nick1 nick2`)
+- [ ] Player comparison (two players side by side)
 - [ ] Playstyle detection (entry fragger, clutcher, support…)
 - [ ] Tips based on the weakest part of the breakdown
 - [ ] Persistent cache (SQLite / Redis) that survives restarts

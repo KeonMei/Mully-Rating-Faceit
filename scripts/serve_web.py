@@ -4,7 +4,7 @@
     python scripts/serve_web.py --port 3000
 
 Serves the pages from public/ and the same /api/rating code that runs on
-Vercel. Needs FACEIT_API_KEY in .env (the Telegram token is not needed).
+Vercel. Needs FACEIT_API_KEY in .env.
 """
 
 import argparse

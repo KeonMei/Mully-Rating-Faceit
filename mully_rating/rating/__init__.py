@@ -1,6 +1,6 @@
-"""The Mully Rating itself. No network and no Telegram here.
+"""The Mully Rating itself. Pure math, no network here.
 
 formula.py  - turns match stats into a 0–100 score
-tiers.py    - S–D tiers, their emoji and the progress bar
+tiers.py    - S–D tiers and their names
 maps.py     - rating on each map
 """

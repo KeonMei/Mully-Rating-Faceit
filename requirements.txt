@@ -1,3 +1,5 @@
+# Telegram bot dependencies: pip install -r requirements.txt
+# (The website on Vercel installs only what pyproject.toml lists.)
 python-telegram-bot==22.8
 requests==2.34.2
 python-dotenv==1.2.4

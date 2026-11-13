@@ -4,7 +4,7 @@ from mully_rating.bot.messages import maps_text, report_text
 
 def make_report(**changes):
     report = PlayerReport(
-        nickname="Alice <3", avatar=None, elo=2100, level=10, flag="🇰🇿",
+        nickname="Alice <3", avatar=None, elo=2100, level=10, country="kz", flag="🇰🇿",
         score=72.5, tier="B", rank="🟢 B (Good)", bar="▰" * 14 + "▱" * 6,
         matches_requested=30,
         matches=[MatchResult("de_mirage", 80), MatchResult("de_nuke", 40)],

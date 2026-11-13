@@ -12,7 +12,7 @@ from mully_rating.analyzer import AnalysisError
 from mully_rating.bot import messages
 from mully_rating.bot.charts import build_trend_chart
 from mully_rating.bot.keyboards import matches_keyboard, parse_callback, report_keyboard
-from mully_rating.bot.nickname import extract_nickname
+from mully_rating.nickname import extract_nickname
 from mully_rating.bot.reports import get_report
 from mully_rating.faceit.client import FaceitError
 

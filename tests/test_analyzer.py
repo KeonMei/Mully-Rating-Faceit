@@ -39,6 +39,7 @@ def test_report():
     report = analyze_player(client, "alice", 30)
 
     assert report.nickname == "Alice"
+    assert report.country == "kz"
     assert report.flag == "🇰🇿"
     assert report.elo == 2100
     assert report.level == 10

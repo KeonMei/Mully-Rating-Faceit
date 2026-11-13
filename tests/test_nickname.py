@@ -1,6 +1,6 @@
 import pytest
 
-from mully_rating.bot.nickname import extract_nickname
+from mully_rating.nickname import extract_nickname
 
 
 @pytest.mark.parametrize("text, nickname", [

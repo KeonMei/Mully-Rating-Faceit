@@ -32,6 +32,7 @@ class PlayerReport:
     avatar: str | None
     elo: int | str
     level: int | str
+    country: str     # two-letter code, e.g. "kz" (may be empty)
     flag: str
     score: float
     tier: str
@@ -111,6 +112,7 @@ def analyze_player(client, nickname, match_limit=30):
         avatar=player.avatar,
         elo=player.elo,
         level=player.level,
+        country=player.country,
         flag=country_flag(player.country),
         score=rating.score,
         tier=tier,

@@ -1,11 +1,11 @@
 # Vercel reads the website's dependencies from this file (it prefers
 # pyproject.toml over requirements.txt). The website only needs
 # `requests`, so the function stays small and starts fast.
-# The Telegram bot is installed with requirements.txt instead.
+# requirements.txt adds python-dotenv for the local scripts.
 [project]
 name = "mully-rating"
 version = "1.0.0"
-description = "FACEIT CS2 Mully Rating: Telegram bot and website"
+description = "FACEIT CS2 Mully Rating website"
 requires-python = ">=3.11"
 dependencies = [
     "requests==2.34.2",

@@ -1,8 +1,8 @@
 """Vercel Python function: GET /api/rating?player=<nickname>&matches=30
 
 Vercel turns every file in api/ that defines a `handler` class into an
-endpoint. The real code is in mully_rating/web/api.py, so the bot, the
-local dev server (scripts/serve_web.py) and the tests use the same logic.
+endpoint. The real code is in mully_rating/web/api.py, so the local dev
+server (scripts/serve_web.py) and the tests use the same logic.
 """
 
 import sys

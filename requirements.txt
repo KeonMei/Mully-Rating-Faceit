@@ -1,6 +1,5 @@
-# Telegram bot dependencies: pip install -r requirements.txt
-# (The website on Vercel installs only what pyproject.toml lists.)
-python-telegram-bot==22.8
+# For running the website locally (scripts/serve_web.py) and
+# scripts/calibrate.py: pip install -r requirements.txt
+# (Vercel installs only what pyproject.toml lists.)
 requests==2.34.2
 python-dotenv==1.2.4
-matplotlib==3.11.2

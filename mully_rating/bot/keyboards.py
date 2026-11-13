@@ -7,7 +7,7 @@ and old messages always show the player they were sent for.
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from mully_rating.bot.nickname import is_nickname
+from mully_rating.nickname import is_nickname
 
 MATCH_OPTIONS = (10, 30, 50, 100)
 

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mully Rating — FACEIT CS2 player rating</title>
+  <meta name="description" content="Rate any FACEIT CS2 player from 0 to 100: damage, K/D, multikills, opening duels and clutches from their recent matches. 50 is an average FACEIT player.">
+  <meta name="theme-color" content="#0d0f12">
+  <meta property="og:title" content="Mully Rating — FACEIT CS2 player rating">
+  <meta property="og:description" content="How good is a FACEIT player, really? A 0–100 rating from damage, K/D, multikills, opening duels and clutches.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">
+      <img class="brand-mark" src="/favicon.svg" alt="" width="28" height="28">
+      Mully Rating
+    </a>
+    <a class="header-link" href="https://github.com/KeonMei/Mully-Rating-Faceit" target="_blank" rel="noopener">GitHub</a>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>How good is a FACEIT player, really?</h1>
+      <p class="lead">
+        Mully Rating scores a CS2 player from 0 to 100 using damage, K/D,
+        multikills, opening duels and clutches from their recent FACEIT
+        matches. <strong>50 is an average FACEIT player.</strong>
+      </p>
+
+      <form id="search" class="search" autocomplete="off">
+        <label class="visually-hidden" for="player">FACEIT nickname or profile link</label>
+        <input id="player" name="player" type="text" required
+               placeholder="FACEIT nickname or profile link"
+               spellcheck="false" autocapitalize="off" autocorrect="off">
+
+        <fieldset class="matches">
+          <legend>Matches</legend>
+          <label><input type="radio" name="matches" value="10"><span>10</span></label>
+          <label><input type="radio" name="matches" value="30" checked><span>30</span></label>
+          <label><input type="radio" name="matches" value="50"><span>50</span></label>
+          <label><input type="radio" name="matches" value="100"><span>100</span></label>
+        </fieldset>
+
+        <button id="submit" type="submit">Analyze</button>
+      </form>
+    </section>
+
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+
+    <section id="result" class="result" hidden>
+      <div class="top-grid">
+        <article class="card player-card">
+          <div class="avatar-wrap">
+            <img id="avatar" class="avatar" alt="" width="72" height="72" hidden>
+            <span id="avatar-fallback" class="avatar avatar-fallback" aria-hidden="true"></span>
+          </div>
+          <div class="player-info">
+            <h2 id="nickname" class="nickname"></h2>
+            <p id="player-meta" class="player-meta"></p>
+            <p id="matches-note" class="muted small"></p>
+          </div>
+        </article>
+
+        <article id="score-card" class="card score-card">
+          <p class="card-label">Mully Rating</p>
+          <div class="score-row">
+            <span id="score" class="score"></span>
+            <span id="tier" class="tier-badge"></span>
+          </div>
+          <div class="meter" aria-hidden="true">
+            <div id="score-fill" class="meter-fill"></div>
+            <span class="meter-average" title="Average FACEIT player"></span>
+          </div>
+          <p class="muted small">The line marks 50, an average FACEIT player.</p>
+        </article>
+      </div>
+
+      <article class="card">
+        <div class="card-head">
+          <h3>Breakdown</h3>
+          <p class="muted small">0–100 for each part · 50 = average</p>
+        </div>
+        <div id="breakdown" class="breakdown"></div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <h3>Stats</h3>
+          <p class="muted small">Over all analysed matches · average player in grey</p>
+        </div>
+        <div id="stats" class="stats"></div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <h3>Rating by match</h3>
+          <p class="muted small">Oldest → newest · hover or tap a point</p>
+        </div>
+        <div id="trend" class="trend"></div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <h3>Maps</h3>
+          <p class="muted small">All rounds on a map rated together</p>
+        </div>
+        <div id="maps"></div>
+      </article>
+
+      <p class="share">
+        <button id="copy-link" class="link-button" type="button">Copy link to this result</button>
+      </p>
+    </section>
+
+    <section class="about">
+      <h2>How the rating works</h2>
+      <div class="about-grid">
+        <div>
+          <h3>What counts</h3>
+          <ul>
+            <li><strong>80% combat:</strong> ADR, K/D, kills per round and MVPs.</li>
+            <li><strong>10% multikills:</strong> rounds with 2, 3, 4 or 5 kills.</li>
+            <li><strong>5% entry:</strong> opening duels won.</li>
+            <li><strong>5% clutch:</strong> clutches won compared with an average player.</li>
+          </ul>
+          <p class="muted">
+            Stats are added up over all matches, so one extreme game
+            doesn't decide the result. Each stat is compared with an
+            average FACEIT player.
+            <a href="https://github.com/KeonMei/Mully-Rating-Faceit/blob/main/docs/rating.md" target="_blank" rel="noopener">Full explanation →</a>
+          </p>
+        </div>
+        <div>
+          <h3>Tiers</h3>
+          <ul class="tiers">
+            <li class="tier-S"><span class="dot"></span><strong>S · Strong</strong> 90–100</li>
+            <li class="tier-A"><span class="dot"></span><strong>A · Great</strong> 75–89</li>
+            <li class="tier-B"><span class="dot"></span><strong>B · Good</strong> 60–74</li>
+            <li class="tier-C"><span class="dot"></span><strong>C · Average</strong> 45–59</li>
+            <li class="tier-D"><span class="dot"></span><strong>D · Weak</strong> 0–44</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer container">
+    <p>
+      Not affiliated with FACEIT. Data from the FACEIT Data API.
+      <a href="https://github.com/KeonMei/Mully-Rating-Faceit" target="_blank" rel="noopener">Source code</a>
+    </p>
+  </footer>
+</body>
+</html>
